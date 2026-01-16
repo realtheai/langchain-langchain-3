@@ -53,7 +53,8 @@ export default function EligibilityResultPage() {
     );
   }
   
-  const isEligible = result.eligible;
+  // result.result가 "PASS" 또는 "ELIGIBLE"이면 신청 가능
+  const isEligible = result.result === 'PASS' || result.result === 'ELIGIBLE' || result.eligible === true;
   
   return (
     <main className="max-w-[800px] mx-auto px-6 py-12">
@@ -85,40 +86,50 @@ export default function EligibilityResultPage() {
             분석 리포트
           </h4>
           <div className="space-y-4">
-            {result.requirements && result.requirements.map((req, idx) => (
-              <div
-                key={idx}
-                className={`flex items-center justify-between p-4 rounded-xl border ${
-                  req.met
-                    ? 'border-[#eaf0ef] dark:border-[#333] hover:bg-background-light dark:hover:bg-[#2c3236]'
-                    : 'border-[#DB924B]/30 bg-[#DB924B]/5 hover:bg-[#DB924B]/10'
-                } transition-colors`}
-              >
-                <div className="flex items-center gap-4">
+            {/* details 사용 (Backend API 응답) */}
+            {(result.details || []).map((item, idx) => {
+              const label = item.condition;
+              const isMet = item.status === 'PASS';
+              const reason = item.reason || '';
+
+              return (
+                <div
+                  key={idx}
+                  className={`flex items-center justify-between p-4 rounded-xl border ${
+                    isMet
+                      ? 'border-[#eaf0ef] dark:border-[#333] hover:bg-background-light dark:hover:bg-[#2c3236]'
+                      : 'border-[#DB924B]/30 bg-[#DB924B]/5 hover:bg-[#DB924B]/10'
+                  } transition-colors`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`flex items-center justify-center rounded-full shrink-0 size-10 ${
+                        isMet
+                          ? 'text-[#078830] bg-[#078830]/10'
+                          : 'text-[#DB924B] bg-[#DB924B]/20'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined">
+                        {isMet ? 'check_circle' : 'cancel'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-lg font-medium">{label}</p>
+                      {reason && <p className="text-sm text-text-muted">{reason}</p>}
+                    </div>
+                  </div>
                   <div
-                    className={`flex items-center justify-center rounded-full shrink-0 size-10 ${
-                      req.met
-                        ? 'text-[#078830] bg-[#078830]/10'
-                        : 'text-[#DB924B] bg-[#DB924B]/20'
+                    className={`shrink-0 flex items-center gap-2 px-3 py-1 rounded-full border ${
+                      isMet
+                        ? 'text-[#078830] bg-[#078830]/5 border-[#078830]/20'
+                        : 'text-[#DB924B] bg-[#DB924B]/5 border-[#DB924B]/20'
                     }`}
                   >
-                    <span className="material-symbols-outlined">
-                      {req.met ? 'check_circle' : 'cancel'}
-                    </span>
+                    <span className="text-sm font-bold">{isMet ? '충족' : '미충족'}</span>
                   </div>
-                  <p className="text-lg font-medium">{req.requirement}</p>
                 </div>
-                <div
-                  className={`shrink-0 flex items-center gap-2 px-3 py-1 rounded-full border ${
-                    req.met
-                      ? 'text-[#078830] bg-[#078830]/5 border-[#078830]/20'
-                      : 'text-[#DB924B] bg-[#DB924B]/5 border-[#DB924B]/20'
-                  }`}
-                >
-                  <span className="text-sm font-bold">{req.met ? '충족' : '미충족'}</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -170,7 +181,15 @@ export default function EligibilityResultPage() {
       
       <div className="mt-4 flex justify-center">
         <button
-          onClick={() => router.push(routes.search)}
+          onClick={() => {
+            // sessionStorage에서 마지막 검색 URL 가져오기
+            const lastSearchUrl = sessionStorage.getItem('lastSearchUrl');
+            if (lastSearchUrl) {
+              router.push(lastSearchUrl);
+            } else {
+              router.push(routes.search);
+            }
+          }}
           className="text-text-muted hover:text-primary text-sm font-semibold flex items-center gap-1 transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">search</span>
@@ -194,4 +213,3 @@ export default function EligibilityResultPage() {
     </main>
   );
 }
-

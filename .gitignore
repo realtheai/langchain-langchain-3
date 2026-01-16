@@ -86,15 +86,6 @@ frontend/yarn-error.log*
 # Alembic
 alembic/versions/*.pyc
 
-# Project planning documents
-folder_tree.md
-folder_tree copy.md
-IMPLEMENTATION_SUMMARY.md
-plan.md
-prd.md
-agent.md
-simple_db.md
-db.md
-qaagent_improve_plan.md 
-langsmith_evaluation_guide.md
-LANGSMITH_SETUP.md
+# Markdown files (except README.md)
+*.md
+!README.md

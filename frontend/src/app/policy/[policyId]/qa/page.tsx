@@ -438,15 +438,19 @@ export default function PolicyQAPage() {
         </div>
         <nav className="flex flex-col gap-2">
           <div
-            onClick={() => router.push(routes.search)}
+            onClick={() => {
+              // 첫 검색 화면으로 돌아가기
+              const lastSearchUrl = sessionStorage.getItem('lastSearchUrl');
+              if (lastSearchUrl) {
+                router.push(lastSearchUrl);
+              } else {
+                router.push(routes.search);
+              }
+            }}
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted hover:bg-[#eaf0ef] dark:hover:bg-[#2d3235] cursor-pointer transition-colors"
           >
             <span className="material-symbols-outlined text-[22px]">format_list_bulleted</span>
-            <p className="text-sm font-medium">All Policies</p>
-          </div>
-          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 cursor-pointer">
-            <span className="material-symbols-outlined text-[22px]">chat_bubble</span>
-            <p className="text-sm font-bold">Q&A History</p>
+            <p className="text-sm font-medium">다른 정책 찾아보기</p>
           </div>
         </nav>
       </aside>

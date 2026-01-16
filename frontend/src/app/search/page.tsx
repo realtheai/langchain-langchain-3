@@ -21,6 +21,13 @@ export default function SearchPage() {
   
   const { policies, total, loading, setPolicies, setLoading, setError } = usePolicyStore();
   
+  // 현재 검색 URL을 sessionStorage에 저장 (eligibility 결과 페이지에서 돌아올 때 사용)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (query || regionParam || categoryParam)) {
+      sessionStorage.setItem('lastSearchUrl', window.location.pathname + window.location.search);
+    }
+  }, [query, regionParam, categoryParam]);
+  
   const [regions, setRegions] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState(regionParam);

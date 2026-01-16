@@ -78,16 +78,6 @@ export default function PolicyDetailPage() {
               <p className="text-text-muted text-lg max-w-2xl leading-relaxed">
                 {currentPolicy.support_description}
               </p>
-              <div className="flex flex-wrap gap-3 mt-2">
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#eaf0ef] dark:bg-gray-800 text-[#111817] dark:text-white text-sm font-bold rounded-lg hover:bg-[#d9e4e2] transition-colors">
-                  <span className="material-symbols-outlined text-lg">share</span>
-                  Share Policy
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 border border-[#eaf0ef] dark:border-gray-800 text-text-muted text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  <span className="material-symbols-outlined text-lg">bookmark</span>
-                  Save to Favorites
-                </button>
-              </div>
             </div>
           </div>
           

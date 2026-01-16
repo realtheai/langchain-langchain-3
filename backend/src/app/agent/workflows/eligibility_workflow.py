@@ -15,7 +15,9 @@ from ..nodes.eligibility_nodes import (
     check_existing_slots_node,
     generate_question_node,
     process_answer_node,
-    final_decision_node
+    final_decision_node,
+    generate_checklist_node,
+    apply_checklist_node
 )
 
 logger = get_logger()
@@ -304,6 +306,59 @@ def run_eligibility_answer(
             "session_id": session_id,
             "current_question": "죄송합니다. 답변 처리 중 오류가 발생했습니다.",
             "completed": False,
+            "error": str(e)
+        }
+
+
+@trace_workflow(
+    name="run_eligibility_result",
+    tags=get_feature_tags("EC"),
+    metadata={"action": "result"}
+)
+def run_eligibility_result(
+    session_id: str,
+    current_state: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    자격 확인 최종 결과 조회
+    
+    Args:
+        session_id: 세션 ID
+        current_state: 현재 상태
+    
+    Returns:
+        Dict: 최종 자격 판정 결과
+    """
+    try:
+        # Run final decision if not already done
+        if "final_result" not in current_state or not current_state.get("final_result"):
+            final_state = final_decision_node(current_state)
+        else:
+            final_state = current_state
+        
+        logger.info(
+            "Eligibility result retrieved",
+            extra={
+                "session_id": session_id,
+                "result": final_state.get("final_result")
+            }
+        )
+        
+        return final_state
+        
+    except Exception as e:
+        logger.error(
+            "Error running eligibility result",
+            extra={
+                "session_id": session_id,
+                "error": str(e)
+            },
+            exc_info=True
+        )
+        return {
+            **current_state,
+            "final_result": "NOT_ELIGIBLE",
+            "reason": f"결과 조회 중 오류 발생: {str(e)}",
             "error": str(e)
         }
 

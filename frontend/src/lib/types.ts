@@ -136,14 +136,15 @@ export interface ConditionResult {
 export interface EligibilityResult {
   session_id: string;
   policy_id: number;
-  eligible: boolean;
-  result: 'ELIGIBLE' | 'NOT_ELIGIBLE' | 'PARTIALLY';
+  result: 'ELIGIBLE' | 'NOT_ELIGIBLE' | 'PARTIALLY' | 'UNKNOWN' | 'PASS' | 'FAIL';
   reason: string;
-  requirements: Array<{
+  details: ConditionResult[];
+  // Legacy support
+  eligible?: boolean;
+  requirements?: Array<{
     requirement: string;
     met: boolean;
   }>;
-  details?: ConditionResult[];
 }
 
 // ============================================================

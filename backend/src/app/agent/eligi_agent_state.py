@@ -13,31 +13,23 @@ class QAState(TypedDict):
     Attributes:
         session_id: 세션 ID
         policy_id: 정책 ID
-        messages: 대화 이력 (캐시에서 가져온 메시지)
+        messages: 대화 이력
         current_query: 현재 질문
-        query_type: 질문 유형 (WEB_ONLY vs POLICY_QA)
-        policy_info: 캐시된 정책 기본 정보
-        retrieved_docs: 캐시에서 가져온 전체 문서 (Qdrant 검색 없음!)
+        retrieved_docs: 검색된 문서
         web_sources: 웹 검색 결과
         answer: 생성된 답변
-        need_web_search: 웹 검색 필요 여부 (POLICY_QA에서 보완용)
+        need_web_search: 웹 검색 필요 여부
         evidence: 근거 목록
         error: 에러 메시지 (선택)
     """
     session_id: str
     policy_id: int
-    messages: List[Dict[str, str]]  # 캐시에서 가져온 대화 이력
+    messages: List[Dict[str, str]]  # {"role": "user/assistant", "content": str}
     current_query: str
-    
-    # 🆕 신규 필드
-    query_type: Literal["WEB_ONLY", "POLICY_QA"]  # 질문 유형
-    policy_info: Dict[str, Any]  # 캐시된 정책 기본 정보
-    
-    # 기존 필드
-    retrieved_docs: List[Dict[str, Any]]  # 캐시에서 가져온 전체 문서
+    retrieved_docs: List[Dict[str, Any]]
     web_sources: List[Dict[str, Any]]
     answer: str
-    need_web_search: bool  # POLICY_QA에서 웹 검색 보완 필요 여부
+    need_web_search: bool
     evidence: List[Dict[str, Any]]
     error: Optional[str]
 
@@ -45,29 +37,13 @@ class QAState(TypedDict):
 class EligibilityState(TypedDict, total=False):
     """
     자격 확인 워크플로우 상태 (Phase 4)
-    
-    total=False로 설정하여:
+
+    total=False 로 두면:
     - LangGraph에서 "업데이트 dict는 최소 1개 키만 포함하면 됨"
     - 각 노드가 필요한 필드만 부분 업데이트 가능
     - 초기 state를 만들 때도 유연해짐
-    
-    Attributes:
-        session_id: 세션 ID
-        policy_id: 정책 ID
-        apply_target: 신청 대상 텍스트
-        conditions: 조건 리스트
-        user_slots: 사용자 입력 슬롯
-        current_question: 현재 질문
-        current_condition_index: 현재 조건 인덱스
-        user_answer: 사용자 답변 (Q&A 방식)
-        final_result: 최종 결과
-        reason: 판정 사유
-        error: 에러 메시지 (선택)
-        extra_requirements: 추가 요구사항 (LLM 추출)
-        checklist: 조건을 체크리스트 형태로 정리
-        checklist_result: 체크리스트 판정 결과
-        completed: 모든 조건 확인 완료 여부
     """
+
     # ===== 필수로 쓰는 핵심 상태 =====
     session_id: str
     policy_id: int
@@ -77,19 +53,18 @@ class EligibilityState(TypedDict, total=False):
     current_question: str
     current_condition_index: int
     user_answer: str                           # 사용자 답변 (Q&A 방식)
-    
-    # ===== 최종 결과 =====
+
+    # ✅ 너 로그에 실제로 들어가던 값까지 포함
     final_result: Literal["ELIGIBLE", "NOT_ELIGIBLE", "PARTIALLY", "CANNOT_DETERMINE"]
     reason: str
-    
+
     # ===== 에러/추가 요구사항 =====
     error: Optional[str]                       # 에러 메시지 저장
     extra_requirements: Optional[Any]          # LLM 추출의 "추가 요구사항" 등
-    
-    # ===== 체크리스트 관련 =====
+
+    # ===== (로그에서 문제였던) 체크리스트 관련 =====
     checklist: List[Dict[str, Any]]            # 조건을 체크리스트 형태로 정리한 것
     checklist_result: List[Dict[str, Any]]     # 체크리스트 판정 결과
-    
+
     # ===== 완료 플래그 =====
     completed: bool                            # 모든 조건 확인 완료 여부
-
